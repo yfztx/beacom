@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 endTime = System.currentTimeMillis();
                                 if (endTime - startTime >200){
-                                    isResume = true;
+                                    isResume = true;//记录这个状态值
                                     mDevices.notifyDataSetChanged();
                                 }
                                 toolbar.setTitle("Total " + mDevices.getCount() + " Devices");
