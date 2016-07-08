@@ -66,10 +66,6 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     public void addDevice(BeaconDevice device) {
         if (!beaconDevices.contains(device)) {
-            for (BeaconDevice mDevi : beaconDevices){
-                Log.i(TAG," Rssi111=="+mDevi.rssi);
-            }
-
             if (beaconDevices.size() !=0) {
                     int num = device.rssi - beaconDevices.get(0).rssi;
                     Log.i(TAG,"addDEvice:  num =="+num);
@@ -78,18 +74,14 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
                         if (beaconDevices.size()>1)
                         beaconDevices.remove(1);
                     }
-
                }else  beaconDevices.add(device);
 
             refreshDeviceHashMap();
         }
         //sortIntMethod(beaconDevices);
-        for (BeaconDevice mDevi : beaconDevices){
-            Log.i(TAG," Rssi222=="+mDevi.rssi);
-        }
     }
 
-    private void sortIntMethod(ArrayList<BeaconDevice> beaconDevices) {
+    public void sortIntMethod() {
         Collections.sort(beaconDevices, new Comparator<BeaconDevice>() {
             @Override
             public int compare(BeaconDevice lhs, BeaconDevice rhs) {
@@ -101,7 +93,7 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        sortIntMethod(beaconDevices);
+       // sortIntMethod();
         super.notifyDataSetChanged();
     }
 

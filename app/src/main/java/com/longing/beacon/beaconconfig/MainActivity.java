@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         activity = this;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         adapter_lock = false;
+        mLists = new ArrayList<>();
+        deviceBean = new DeviceBean();
 
         if (toolbar != null) {
             toolbar.inflateMenu(R.menu.tool_bar_items);
@@ -271,13 +274,18 @@ public class MainActivity extends AppCompatActivity {
     private int mRssi_6[] = new int[5];
     private long endTime;
     private boolean isResume = true;
+    private ArrayList<DeviceBean> mLists ;
+    private DeviceBean deviceBean ;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
-
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-                    final int rssi_val = rssi;
-
+                    long mTime = System.currentTimeMillis();
+                    final int rssi_val = rssi ;
+                    String deviceName = device.getName();
+                    if (isName(deviceName)){
+                       // if ()
+                    }
                     // if (rssi < -70) return;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -346,18 +354,19 @@ public class MainActivity extends AppCompatActivity {
                                     mDevices.addDevice(newBeaconDevice);
                                 }
                                 endTime = System.currentTimeMillis();
-                                if (endTime - startTime >200){
+                                /*if (endTime - startTime >500){
                                     isResume = true;//记录这个状态值
-                                    mDevices.notifyDataSetChanged();
-                                }
+                                    mDevices.sortIntMethod();
+                                }*/
+                                mDevices.notifyDataSetChanged();
                                 toolbar.setTitle("Total " + mDevices.getCount() + " Devices");
                                 unlock_list();
+
                             }
                         }
                     });
                 }
             };
-
     private int saveData(int[] array,int rssi ) {
         int num = 0;
         Log.i(TAG,"saveData ===     =========");
@@ -433,7 +442,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean isName(String name) {
         for (int i=0;i< mName.length;i++){
            if (mName[i].equals(name)) {
-
                return true;
            }
         }

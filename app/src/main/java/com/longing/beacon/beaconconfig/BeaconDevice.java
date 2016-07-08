@@ -106,6 +106,7 @@ public class BeaconDevice implements Parcelable{
         this.device = device;
         this.rssi = rssi;
         this.mac = device.getAddress();
+        String name = device.getName();
         if (scanRecord[0] != 2)  // Number of bytes that follow in first AD structure
         {
             Log.i(TAG, "updateInfo failed, data 0 error.");
@@ -218,8 +219,8 @@ public class BeaconDevice implements Parcelable{
 
         // Log.i(TAG, "updateInfo OK! (" + (beacon_received_time != null ? beacon_received_time.toString() : "") + ")uuid = " + (this.uuid == null ? "" : this.uuid.toString()) + ", mac = " + this.mac + ", rssi=" + this.rssi + ", txpower = " + this.txpower);
         restart_timer();
-        String name = device.getName();
-        if ("MYSD_5437B4".equals(name) ){
+       // String name = device.getName();
+       /* if ("MYSD_5437B4".equals(name) ){
             this.rssi = saveData(mRssi_1, rssi);
 
         }
@@ -242,7 +243,7 @@ public class BeaconDevice implements Parcelable{
         if ("MYSD_5445A5".equals(name) ){
             this.rssi = saveData(mRssi_6, rssi);
 
-        }
+        }*/
         return true;
     }
 
