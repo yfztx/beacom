@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        Log.i(TAG, Thread.currentThread().getStackTrace()[2].getMethodName());
+        Log.i(TAG, Thread.currentThread().getStackTrace()[2].getMethodName()+"==");
         super.onResume();
         if (!mScanning) {
             scanLeDevice(true);
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-                    long mTime = System.currentTimeMillis();
+                    final long mTime = System.currentTimeMillis();
                     final int rssi_val = rssi ;
                     String deviceName = device.getName();
                     if (isName(deviceName)){
@@ -314,9 +314,10 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             if (newBeaconDevice.updateInfo(device, rssi_val, scanRecord)) {
-                                newBeaconDevice.setTimeoutCallback(device_timeout_cb);
+                               // newBeaconDevice.setTimeoutCallback(device_timeout_cb);
                                 lock_list();
                                 String name = newBeaconDevice.device.getName();
+                                newBeaconDevice.setmTime(mTime);
 
                                // "MYSD_5437B4","MYSD_544167","MYSD_54313F","MYSD_543DC8","MYSD_5445A6","MYSD_5445A5"
 
@@ -350,14 +351,14 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
 */
-                                if (isName(name)){
-                                    mDevices.addDevice(newBeaconDevice);
-                                }
+
                                 endTime = System.currentTimeMillis();
-                                /*if (endTime - startTime >500){
+                                if (endTime - startTime >500){
                                     isResume = true;//记录这个状态值
-                                    mDevices.sortIntMethod();
-                                }*/
+                                    if (isName(name)){
+                                        mDevices.addDevice(newBeaconDevice);
+                                    }
+                                }
                                 mDevices.notifyDataSetChanged();
                                 toolbar.setTitle("Total " + mDevices.getCount() + " Devices");
                                 unlock_list();

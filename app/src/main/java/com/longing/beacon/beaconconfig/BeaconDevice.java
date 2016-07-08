@@ -40,6 +40,17 @@ public class BeaconDevice implements Parcelable{
     public TimerTask device_timeout_timer_task;
     private device_timeout_callback timeout_cb;
     private BeaconDevice self;
+    private String name;
+
+    public long getmTime() {
+        return mTime;
+    }
+
+    public void setmTime(long mTime) {
+        this.mTime = mTime;
+    }
+
+    private  long mTime;
 
     public int getDeviceStatus() {
         return deviceStatus;
@@ -85,6 +96,8 @@ public class BeaconDevice implements Parcelable{
         beacon_received_time = null;
         status_received_time = null;
         self = this;
+        name =null;
+        mTime =0;
     }
 
     public boolean equals(Object o) {
@@ -106,7 +119,7 @@ public class BeaconDevice implements Parcelable{
         this.device = device;
         this.rssi = rssi;
         this.mac = device.getAddress();
-        String name = device.getName();
+         name = device.getName();
         if (scanRecord[0] != 2)  // Number of bytes that follow in first AD structure
         {
             Log.i(TAG, "updateInfo failed, data 0 error.");
@@ -219,8 +232,7 @@ public class BeaconDevice implements Parcelable{
 
         // Log.i(TAG, "updateInfo OK! (" + (beacon_received_time != null ? beacon_received_time.toString() : "") + ")uuid = " + (this.uuid == null ? "" : this.uuid.toString()) + ", mac = " + this.mac + ", rssi=" + this.rssi + ", txpower = " + this.txpower);
         restart_timer();
-       // String name = device.getName();
-       /* if ("MYSD_5437B4".equals(name) ){
+      /*  if ("MYSD_5437B4".equals(name) ){
             this.rssi = saveData(mRssi_1, rssi);
 
         }

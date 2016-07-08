@@ -67,15 +67,16 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
     public void addDevice(BeaconDevice device) {
         if (!beaconDevices.contains(device)) {
             if (beaconDevices.size() !=0) {
-                    int num = device.rssi - beaconDevices.get(0).rssi;
-                    Log.i(TAG,"addDEvice:  num =="+num);
-                    if (num >= 5) {
+                int num = device.rssi - beaconDevices.get(0).rssi;
+                Log.i(TAG, "addDEvice:  num ==" + num);
+                if (device.getmTime() - beaconDevices.get(0).getmTime() < 500) {
+                    if (num > 5) {
                         beaconDevices.add(0, device);
-                        if (beaconDevices.size()>1)
-                        beaconDevices.remove(1);
+                        if (beaconDevices.size() > 1)
+                            beaconDevices.remove(1);
                     }
-               }else  beaconDevices.add(device);
-
+                }
+            }else beaconDevices.add(device);
             refreshDeviceHashMap();
         }
         //sortIntMethod(beaconDevices);
