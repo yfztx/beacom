@@ -1,8 +1,7 @@
 package com.longing.beacon.beaconconfig
-;
+        ;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Administrator on 2016-04-21.
@@ -25,6 +26,8 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private Activity mContext;
     private BeaconDeviceRssiComparator rssiComparator;
+    private Timer mTimer = null;
+
     public enum SortType {
         BEACON_DEVICE_SORT_NONE,
         BEACON_DEVICE_SORT_BY_RSSI,
@@ -34,8 +37,8 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
     private class BeaconDeviceRssiComparator implements Comparator {
         @Override
         public int compare(Object lhs, Object rhs) {
-            BeaconDevice ldev = (BeaconDevice)lhs;
-            BeaconDevice rdev = (BeaconDevice)rhs;
+            BeaconDevice ldev = (BeaconDevice) lhs;
+            BeaconDevice rdev = (BeaconDevice) rhs;
             return rdev.rssi - ldev.rssi;
         }
     }
@@ -43,8 +46,8 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
     private class BeaconDeviceMajorMinorComparator implements Comparator {
         @Override
         public int compare(Object lhs, Object rhs) {
-            BeaconDevice ldev = (BeaconDevice)lhs;
-            BeaconDevice rdev = (BeaconDevice)rhs;
+            BeaconDevice ldev = (BeaconDevice) lhs;
+            BeaconDevice rdev = (BeaconDevice) rhs;
             return (ldev.major * 65536 + ldev.minor) - (rdev.major * 65536 + rdev.minor);
         }
     }
@@ -62,39 +65,70 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
         mInflater = c.getLayoutInflater();
         beaconDevices = new ArrayList<BeaconDevice>();
         beaconDeviceIndexes = new HashMap();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sortIntMethod();
+            }
+        }, 500, 500);
     }
 
     public void addDevice(BeaconDevice device) {
         if (!beaconDevices.contains(device)) {
-            if (beaconDevices.size() !=0) {
+          /*  if (beaconDevices.size() != 0) {
                 int num = device.rssi - beaconDevices.get(0).rssi;
                 Log.i(TAG, "addDEvice:  num ==" + num);
                 if (device.getmTime() - beaconDevices.get(0).getmTime() < 500) {
                     if (num > 5) {
                         beaconDevices.add(0, device);
-                        if (beaconDevices.size() > 1)
-                            beaconDevices.remove(1);
+                        //if (beaconDevices.size() > 1)
+                        // beaconDevices.remove(1);
                     }
                 }
-            }else beaconDevices.add(device);
-            refreshDeviceHashMap();
+            } else beaconDevices.add(device);*/
+            beaconDevices.add(device);
+            sortIntMethod();
+            //refreshDeviceHashMap();
         }
         //sortIntMethod(beaconDevices);
+
     }
 
     public void sortIntMethod() {
-        Collections.sort(beaconDevices, new Comparator<BeaconDevice>() {
-            @Override
-            public int compare(BeaconDevice lhs, BeaconDevice rhs) {
-                //if (lhs.rssi - rhs.rssi > 5)return 1;
-                return rhs.rssi - lhs.rssi;
-            }
-        });
+        if (beaconDevices.size() != 0) {
+            final long mCurrentTime = System.currentTimeMillis();
+            Collections.sort(beaconDevices, new Comparator<BeaconDevice>() {
+                @Override
+                public int compare(BeaconDevice lhs, BeaconDevice rhs) {
+                    if (mCurrentTime - lhs.getmTime() >500) return -1;
+                    if (mCurrentTime - rhs.getmTime() >500) return  1;
+                    int rssi1 = lhs.rssi;
+                    int rssi2 = rhs.rssi;
+                    if (rhs.getmTime() - lhs.getmTime() <500) {
+                        if (rssi2 - rssi1 > 5) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+
+                    }else return -1;
+                }
+            });
+            refreshDeviceHashMap();
+           /* if (beaconDevices.size()>1){
+                int rssi1 = beaconDevices.get(0).rssi;
+                int rssi2 = beaconDevices.get(1).rssi;
+                if (rssi1 - rssi2 > 5){
+
+                }
+            }*/
         }
+    }
 
     @Override
     public void notifyDataSetChanged() {
-       // sortIntMethod();
+        // sortIntMethod();
         super.notifyDataSetChanged();
     }
 
@@ -120,7 +154,7 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     public BeaconDevice getDevice(String mac) {
         if (beaconDeviceIndexes.containsKey(mac)) {
-            return beaconDevices.get((int)beaconDeviceIndexes.get(mac));
+            return beaconDevices.get((int) beaconDeviceIndexes.get(mac));
         }
         return null;
     }
@@ -132,14 +166,15 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        //// TODO: 2016/7/11  beaconDevices.size()
         return beaconDevices.size();
     }
 
     public int getCountByRSSI(int rssi) {
         int count = 0;
-        for (int i=0;i<beaconDevices.size();i++) {
+        for (int i = 0; i < beaconDevices.size(); i++) {
             if (beaconDevices.get(i).rssi > rssi) {
-                count ++;
+                count++;
             }
         }
 
@@ -159,6 +194,7 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        //i =0;
         ViewHolder viewHolder;
         // General ListView optimization code.
         if (view == null) {
@@ -170,11 +206,11 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
                     .findViewById(R.id.text_mac_addr);
             viewHolder.deviceUUID = (TextView) view.findViewById(R.id.text_uuid);
             viewHolder.deviceMajorMinor = (TextView) view.findViewById(R.id.text_major_minor);
-            viewHolder.rssi = (TextView)view.findViewById(R.id.text_rssi);
-            viewHolder.distance = (TextView)view.findViewById(R.id.text_distance);
-            viewHolder.battery_level = (TextView)view.findViewById(R.id.text_battery_level);
-            viewHolder.image_signal_level = (ImageView)view.findViewById(R.id.image_signal_level);
-            viewHolder.image_battery_level = (ImageView)view.findViewById(R.id.image_battery_level);
+            viewHolder.rssi = (TextView) view.findViewById(R.id.text_rssi);
+            viewHolder.distance = (TextView) view.findViewById(R.id.text_distance);
+            viewHolder.battery_level = (TextView) view.findViewById(R.id.text_battery_level);
+            viewHolder.image_signal_level = (ImageView) view.findViewById(R.id.image_signal_level);
+            viewHolder.image_battery_level = (ImageView) view.findViewById(R.id.image_battery_level);
 
             view.setTag(viewHolder);
         } else {
@@ -201,7 +237,7 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
         viewHolder.deviceMajorMinor.setText("Major: " + device.major + ", Minor: " + device.minor);
         viewHolder.position = i;
         viewHolder.rssi.setText("rssi: " + device.rssi);
-        viewHolder.distance.setText(String.format("%.2fm", Utils.distance_from_rssi(device.rssi, (double)device.txpower)));
+        viewHolder.distance.setText(String.format("%.2fm", Utils.distance_from_rssi(device.rssi, (double) device.txpower)));
         viewHolder.image_signal_level.setImageAlpha(255);
         if (device.rssi >= -59) {
             viewHolder.image_signal_level.setImageResource(R.drawable.signal_level_high);

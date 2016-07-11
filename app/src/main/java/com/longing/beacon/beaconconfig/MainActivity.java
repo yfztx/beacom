@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private boolean adapter_lock;
     private boolean mac;
+    private long mTime;
 
     public synchronized void lock_list() {
         while (adapter_lock) {
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putParcelable("BeaconDevice", device);
                     intent.putExtra("bundle", bundle);
                     Log.i(TAG, "put BeaconDevice: " + device.toString());
-                   startActivityForResult(intent, DeviceConfigActivity.ResultReqestCode);
+                    startActivityForResult(intent, DeviceConfigActivity.ResultReqestCode);
                 }
             });
         }
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        Log.i(TAG, Thread.currentThread().getStackTrace()[2].getMethodName()+"==");
+        Log.i(TAG, Thread.currentThread().getStackTrace()[2].getMethodName() + "==");
         super.onResume();
         if (!mScanning) {
             scanLeDevice(true);
@@ -231,17 +232,21 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    long startTime =0;
+
+    long startTime = 0;
+
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            if (isResume){
+            if (isResume) {
                 isResume = false;
                 startTime = System.currentTimeMillis();
             }
             if (mScanning) {
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
             }
+
             mScanning = true;
+
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
             mScanning = false;
@@ -265,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    int count =0;
+    int count = 0;
     private int mRssi_1[] = new int[5];
     private int mRssi_2[] = new int[5];
     private int mRssi_3[] = new int[5];
@@ -274,18 +279,14 @@ public class MainActivity extends AppCompatActivity {
     private int mRssi_6[] = new int[5];
     private long endTime;
     private boolean isResume = true;
-    private ArrayList<DeviceBean> mLists ;
-    private DeviceBean deviceBean ;
+    private ArrayList<DeviceBean> mLists;
+    private DeviceBean deviceBean;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord) {
-                    final long mTime = System.currentTimeMillis();
-                    final int rssi_val = rssi ;
-                    String deviceName = device.getName();
-                    if (isName(deviceName)){
-                       // if ()
-                    }
+                    mTime = System.currentTimeMillis();
+                    final int rssi_val = rssi;
                     // if (rssi < -70) return;
                     runOnUiThread(new Runnable() {
                         @Override
@@ -295,31 +296,24 @@ public class MainActivity extends AppCompatActivity {
                                     + ", address:" + device.getAddress()
                                     + ", rssi:" + String.valueOf(rssi_val)
                                     + ", scanRecord(" + String.valueOf(scanRecord.length) + "bytes): " + Utils.bytesToHexString(scanRecord));
-
 */
                             String mac = device.getAddress();
-                            //count++;
-                         /*   if ("E7:07:46:6E:8D:25".equals(mac) ) {
-
-                                Log.i("MeiYouAndrXiaoLu", "MeiYou_mac =" + device.getAddress() + "  rssi =" + rssi + " scanRecord =" + Utils.bytesToHexString(scanRecord));
-                            }
-                            if ( "46:0D:A8:8F:A4:1B".equals(mac)){
-
-                                Log.i("MeiYouAndrXiaoLu", "XiaoLu_mac =" + device.getAddress() + "  rssi =" + rssi + " scanRecord =" + Utils.bytesToHexString(scanRecord));
-                            }*/
-                            BeaconDevice newBeaconDevice = mDevices.getDevice(device.getAddress());
-                            if (newBeaconDevice == null) {
-                                newBeaconDevice = new BeaconDevice();
-
-                            }
-
-                            if (newBeaconDevice.updateInfo(device, rssi_val, scanRecord)) {
-                               // newBeaconDevice.setTimeoutCallback(device_timeout_cb);
-                                lock_list();
-                                String name = newBeaconDevice.device.getName();
+                            long l = System.currentTimeMillis() - mTime;
+                            // Log.i(TAG,"name ==" +device.getName() + "  time="+l);
+                            if (l < 500) {
+                                BeaconDevice newBeaconDevice = mDevices.getDevice(device.getAddress());
+                                if (newBeaconDevice == null) {
+                                    newBeaconDevice = new BeaconDevice();
+                                }
                                 newBeaconDevice.setmTime(mTime);
+                                if (newBeaconDevice.updateInfo(device, rssi_val, scanRecord)) {
+                                    newBeaconDevice.setTimeoutCallback(device_timeout_cb);
+                                    lock_list();
+                                    String name = newBeaconDevice.device.getName();
 
-                               // "MYSD_5437B4","MYSD_544167","MYSD_54313F","MYSD_543DC8","MYSD_5445A6","MYSD_5445A5"
+                                    newBeaconDevice.setmTime(mTime);
+
+                                    // "MYSD_5437B4","MYSD_544167","MYSD_54313F","MYSD_543DC8","MYSD_5445A6","MYSD_5445A5"
 
                               /*  if ("MYSD_5437B4".equals(name) || "MYSD_544167".equals(name) || "MYSD_54313F".equals(name)
                                         || "MYSD_543DC8".equals(name)|| "MYSD_5445A6".equals(name) ||"MYSD_5445A5".equals(name)) {
@@ -328,60 +322,53 @@ public class MainActivity extends AppCompatActivity {
                                 }*/
                                /* if ("MYSD_5437B4".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_1, rssi_val);
-
                                 }
                                 if ("MYSD_544167".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_2, rssi_val);
-
                                 }
                                 if ("MYSD_54313F".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_3, rssi_val);
-
                                 }
                                 if ("MYSD_543DC8".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_4, rssi_val);
-
                                 }
                                 if ("MYSD_5445A6".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_5, rssi_val);
-
                                 }
                                 if ("MYSD_5445A5".equals(name) ){
                                     newBeaconDevice.rssi = saveData(mRssi_6, rssi_val);
-
-                                }
-*/
-
-                                endTime = System.currentTimeMillis();
-                                if (endTime - startTime >500){
-                                    isResume = true;//记录这个状态值
-                                    if (isName(name)){
+                                }*/
+                                    if (isName(name)) {
                                         mDevices.addDevice(newBeaconDevice);
                                     }
-                                }
-                                mDevices.notifyDataSetChanged();
-                                toolbar.setTitle("Total " + mDevices.getCount() + " Devices");
-                                unlock_list();
+                                    if ( System.currentTimeMillis() - startTime > 500) {
+                                        isResume = true;//记录这个状态值
+                                    }
+                                    mDevices.notifyDataSetChanged();
+                                    toolbar.setTitle("Total " + mDevices.getCount() + " Devices");
+                                    unlock_list();
 
+                                }
                             }
                         }
                     });
                 }
             };
-    private int saveData(int[] array,int rssi ) {
+
+    private int saveData(int[] array, int rssi) {
         int num = 0;
-        Log.i(TAG,"saveData ===     =========");
-        for (int i= array.length-1;i>=0;i--){
-            if (i==0) {
+        Log.i(TAG, "saveData ===     =========");
+        for (int i = array.length - 1; i >= 0; i--) {
+            if (i == 0) {
                 array[0] = rssi;
-            }else {
-                array[i]= array[i-1];
+            } else {
+                array[i] = array[i - 1];
             }
-            Log.i(TAG," "+ array[i]+"\n");
+            Log.i(TAG, " " + array[i] + "\n");
             num += array[i];
         }
 
-        return num/5;
+        return num / 5;
     }
 
     @Override
@@ -412,8 +399,8 @@ public class MainActivity extends AppCompatActivity {
                 if (intent != null) {
                     Bundle data = intent.getBundleExtra("result");
                     final BeaconDevice device = data.getParcelable("BeaconDevice");
-                    Log.i(TAG, "===onActivityResult=== status="+device.getDeviceStatus());
-                    if (device.getDeviceStatus() == 129){
+                    Log.i(TAG, "===onActivityResult=== status=" + device.getDeviceStatus());
+                    if (device.getDeviceStatus() == 129) {
                         mBluetoothAdapter.disable();
                         try {
                             Thread.sleep(2500);
@@ -439,12 +426,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    String mName[] = {"MYSD_5437B4","MYSD_544167","MYSD_54313F","MYSD_543DC8","MYSD_5445A6","MYSD_5445A5"};
+
+    String mName[] = {"MYSD_5437B4", "MYSD_544167", "MYSD_54313F", "MYSD_543DC8", "MYSD_5445A6", "MYSD_5445A5"};
+
     public boolean isName(String name) {
-        for (int i=0;i< mName.length;i++){
-           if (mName[i].equals(name)) {
-               return true;
-           }
+        for (int i = 0; i < mName.length; i++) {
+            if (mName[i].equals(name)) {
+                return true;
+            }
         }
         return false;
     }
