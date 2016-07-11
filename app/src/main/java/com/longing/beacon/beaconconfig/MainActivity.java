@@ -339,10 +339,15 @@ public class MainActivity extends AppCompatActivity {
                                     newBeaconDevice.rssi = saveData(mRssi_6, rssi_val);
                                 }*/
                                     if (isName(name)) {
+                                    }
+                                    if("MYSD_5445BE".equals(name) || "MYSD_5444AC".equals(name)){
                                         mDevices.addDevice(newBeaconDevice);
+
                                     }
                                     if ( System.currentTimeMillis() - startTime > 500) {
                                         isResume = true;//记录这个状态值
+                                        Log.i(TAG," System.currentTimeMillis()");
+                                        mDevices.sortIntMethod();
                                     }
                                     mDevices.notifyDataSetChanged();
                                     toolbar.setTitle("Total " + mDevices.getCount() + " Devices");

@@ -2,6 +2,7 @@ package com.longing.beacon.beaconconfig
         ;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Administrator on 2016-04-21.
@@ -66,19 +66,20 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
         beaconDevices = new ArrayList<BeaconDevice>();
         beaconDeviceIndexes = new HashMap();
 
-        new Timer().schedule(new TimerTask() {
+       /* new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 sortIntMethod();
             }
-        }, 500, 500);
+        }, 500, 500);*/
     }
 
     public void addDevice(BeaconDevice device) {
         if (!beaconDevices.contains(device)) {
-          /*  if (beaconDevices.size() != 0) {
+            Log.i(TAG, "addDEvice:  num ==" + device);
+           /* if (beaconDevices.size() != 0) {
                 int num = device.rssi - beaconDevices.get(0).rssi;
-                Log.i(TAG, "addDEvice:  num ==" + num);
+
                 if (device.getmTime() - beaconDevices.get(0).getmTime() < 500) {
                     if (num > 5) {
                         beaconDevices.add(0, device);
@@ -88,8 +89,8 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
                 }
             } else beaconDevices.add(device);*/
             beaconDevices.add(device);
-            sortIntMethod();
-            //refreshDeviceHashMap();
+            //sortIntMethod();
+            refreshDeviceHashMap();
         }
         //sortIntMethod(beaconDevices);
 
@@ -97,22 +98,28 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
 
     public void sortIntMethod() {
         if (beaconDevices.size() != 0) {
+            Log.i(TAG,"compare   size=" +beaconDevices.size());
             final long mCurrentTime = System.currentTimeMillis();
             Collections.sort(beaconDevices, new Comparator<BeaconDevice>() {
                 @Override
                 public int compare(BeaconDevice lhs, BeaconDevice rhs) {
-                    if (mCurrentTime - lhs.getmTime() >500) return -1;
-                    if (mCurrentTime - rhs.getmTime() >500) return  1;
+                   // if (mCurrentTime - lhs.getmTime() >500) return -1;
+                   // if (mCurrentTime - rhs.getmTime() >500) return  1;
                     int rssi1 = lhs.rssi;
                     int rssi2 = rhs.rssi;
-                    if (rhs.getmTime() - lhs.getmTime() <500) {
-                        if (rssi2 - rssi1 > 5) {
-                            return 1;
-                        } else {
+                    Log.i(TAG,"compare    rssi2 - rssi1 > 2");
+                   // if (rhs.getmTime() - lhs.getmTime() <500) {
+                        if (rssi1 - rssi2 > 5) {
+                            Log.i(TAG,"compare    rssi2 = "+ rssi2 +"  -" + "  rssi1 "+ rssi1);
                             return -1;
+                        }else if (rssi1 - rssi2 < 5){
+                            return  1;
                         }
+                        else {
+                            return 0;
+                        }
+                   // }return 0;
 
-                    }else return -1;
                 }
             });
             refreshDeviceHashMap();
