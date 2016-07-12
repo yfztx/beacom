@@ -2,7 +2,6 @@ package com.longing.beacon.beaconconfig
         ;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Timer;
 
 /**
  * Created by Administrator on 2016-04-21.
@@ -26,7 +24,6 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private Activity mContext;
     private BeaconDeviceRssiComparator rssiComparator;
-    private Timer mTimer = null;
 
     public enum SortType {
         BEACON_DEVICE_SORT_NONE,
@@ -65,71 +62,41 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
         mInflater = c.getLayoutInflater();
         beaconDevices = new ArrayList<BeaconDevice>();
         beaconDeviceIndexes = new HashMap();
-
-       /* new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sortIntMethod();
-            }
-        }, 500, 500);*/
     }
 
     public void addDevice(BeaconDevice device) {
         if (!beaconDevices.contains(device)) {
-            Log.i(TAG, "addDEvice:  num ==" + device);
-           /* if (beaconDevices.size() != 0) {
-                int num = device.rssi - beaconDevices.get(0).rssi;
-
-                if (device.getmTime() - beaconDevices.get(0).getmTime() < 500) {
-                    if (num > 5) {
-                        beaconDevices.add(0, device);
-                        //if (beaconDevices.size() > 1)
-                        // beaconDevices.remove(1);
-                    }
-                }
-            } else beaconDevices.add(device);*/
+            //Log.i(TAG, "addDEvice:  num ==" + device);
             beaconDevices.add(device);
-            //sortIntMethod();
             refreshDeviceHashMap();
         }
-        //sortIntMethod(beaconDevices);
-
     }
 
+    /**
+     * 对集合数据排序
+     */
     public void sortIntMethod() {
         if (beaconDevices.size() != 0) {
-            Log.i(TAG,"compare   size=" +beaconDevices.size());
+            // Log.i(TAG,"compare   size=" +beaconDevices.size());
             final long mCurrentTime = System.currentTimeMillis();
             Collections.sort(beaconDevices, new Comparator<BeaconDevice>() {
                 @Override
                 public int compare(BeaconDevice lhs, BeaconDevice rhs) {
-                   // if (mCurrentTime - lhs.getmTime() >500) return -1;
-                    if (mCurrentTime - rhs.getmTime() >500) return  1;
+                    if (mCurrentTime - rhs.getmTime() > 500) return 1;
                     int rssi1 = lhs.rssi;
                     int rssi2 = rhs.rssi;
-                    Log.i(TAG,"compare    rssi2 - rssi1 > 2");
-                   // if (rhs.getmTime() - lhs.getmTime() <500) {
-                        if (rssi1 - rssi2 > 5) {
-                            Log.i(TAG,"compare    rssi2 = "+ rssi2 +"  -" + "  rssi1 "+ rssi1);
-                            return -1;
-                        }else if (rssi1 - rssi2 < 5){
-                            return  1;
-                        }
-                        else {
-                            return 0;
-                        }
-                   // }return 0;
-
+                    if (rssi1 - rssi2 > 5) {
+                        //Log.i(TAG,"compare    rssi2 = "+ rssi2 +"  -" + "  rssi1 "+ rssi1);
+                        return -1;
+                    } else if (rssi1 - rssi2 < 5) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
                 }
             });
             refreshDeviceHashMap();
-           /* if (beaconDevices.size()>1){
-                int rssi1 = beaconDevices.get(0).rssi;
-                int rssi2 = beaconDevices.get(1).rssi;
-                if (rssi1 - rssi2 > 5){
 
-                }
-            }*/
         }
     }
 

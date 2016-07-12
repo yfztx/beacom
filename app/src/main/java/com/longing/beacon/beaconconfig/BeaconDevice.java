@@ -259,7 +259,7 @@ public class BeaconDevice implements Parcelable{
         return true;
     }
 
-    private int mRssi_1[] = new int[5];
+   /* private int mRssi_1[] = new int[5];
     private int mRssi_2[] = new int[5];
     private int mRssi_3[] = new int[5];
     private int mRssi_4[] = new int[5];
@@ -279,7 +279,7 @@ public class BeaconDevice implements Parcelable{
         }
 
         return num/5;
-    }
+    }*/
 
     private void restart_timer() {
         if (device_timeout_timer_task != null) {

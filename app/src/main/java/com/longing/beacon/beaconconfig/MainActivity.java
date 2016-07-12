@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean adapter_lock;
     private boolean mac;
     private long mTime;
+    String mName[] = {"MYSD_5437B4", "MYSD_544167", "MYSD_54313F", "MYSD_543DC8", "MYSD_5445A6", "MYSD_5445A5"};
+
 
     public synchronized void lock_list() {
         while (adapter_lock) {
@@ -61,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
         activity = this;
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         adapter_lock = false;
-        mLists = new ArrayList<>();
-        deviceBean = new DeviceBean();
-
         if (toolbar != null) {
             toolbar.inflateMenu(R.menu.tool_bar_items);
             toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -143,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         if (mScanTimer == null) {
             mScanTimer = new Timer();
         }
-
         if (mScanTimerTask == null) {
             mScanTimerTask = new TimerTask() {
                 @Override
@@ -233,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    long startTime = 0;
+    private long startTime = 0;
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
@@ -270,17 +267,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    int count = 0;
-    private int mRssi_1[] = new int[5];
-    private int mRssi_2[] = new int[5];
-    private int mRssi_3[] = new int[5];
-    private int mRssi_4[] = new int[5];
-    private int mRssi_5[] = new int[5];
-    private int mRssi_6[] = new int[5];
-    private long endTime;
     private boolean isResume = true;
-    private ArrayList<DeviceBean> mLists;
-    private DeviceBean deviceBean;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
@@ -299,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
 */
                             String mac = device.getAddress();
                             long l = System.currentTimeMillis() - mTime;
-                            // Log.i(TAG,"name ==" +device.getName() + "  time="+l);
                             if (l < 500) {
                                 BeaconDevice newBeaconDevice = mDevices.getDevice(device.getAddress());
                                 if (newBeaconDevice == null) {
@@ -313,35 +299,10 @@ public class MainActivity extends AppCompatActivity {
 
                                     newBeaconDevice.setmTime(mTime);
 
-                                    // "MYSD_5437B4","MYSD_544167","MYSD_54313F","MYSD_543DC8","MYSD_5445A6","MYSD_5445A5"
-
-                              /*  if ("MYSD_5437B4".equals(name) || "MYSD_544167".equals(name) || "MYSD_54313F".equals(name)
-                                        || "MYSD_543DC8".equals(name)|| "MYSD_5445A6".equals(name) ||"MYSD_5445A5".equals(name)) {
-                                    Log.i(TAG,"name =========" +name);
-                                    mDevices.addDevice(newBeaconDevice);
-                                }*/
-                               /* if ("MYSD_5437B4".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_1, rssi_val);
-                                }
-                                if ("MYSD_544167".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_2, rssi_val);
-                                }
-                                if ("MYSD_54313F".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_3, rssi_val);
-                                }
-                                if ("MYSD_543DC8".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_4, rssi_val);
-                                }
-                                if ("MYSD_5445A6".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_5, rssi_val);
-                                }
-                                if ("MYSD_5445A5".equals(name) ){
-                                    newBeaconDevice.rssi = saveData(mRssi_6, rssi_val);
-                                }*/
                                     if (isName(name)) {
                                         mDevices.addDevice(newBeaconDevice);
                                     }
-                                    /*if("MYSD_5445BE".equals(name) || "MYSD_5444AC".equals(name)){
+                                    /*if("MYSD_5445BE".equals(name) || "MYSD_5444AC".equals(name)){ //测试数据
 
                                     }*/
                                     if ( System.currentTimeMillis() - startTime > 500) {
@@ -362,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int saveData(int[] array, int rssi) {
         int num = 0;
-        Log.i(TAG, "saveData ===     =========");
+        Log.i(TAG, "saveData === 保存最近的5个Rssi数据    =========");
         for (int i = array.length - 1; i >= 0; i--) {
             if (i == 0) {
                 array[0] = rssi;
@@ -432,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    String mName[] = {"MYSD_5437B4", "MYSD_544167", "MYSD_54313F", "MYSD_543DC8", "MYSD_5445A6", "MYSD_5445A5"};
 
     public boolean isName(String name) {
         for (int i = 0; i < mName.length; i++) {
