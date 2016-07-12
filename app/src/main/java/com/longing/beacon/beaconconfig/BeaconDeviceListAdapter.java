@@ -104,7 +104,7 @@ public class BeaconDeviceListAdapter extends BaseAdapter {
                 @Override
                 public int compare(BeaconDevice lhs, BeaconDevice rhs) {
                    // if (mCurrentTime - lhs.getmTime() >500) return -1;
-                   // if (mCurrentTime - rhs.getmTime() >500) return  1;
+                    if (mCurrentTime - rhs.getmTime() >500) return  1;
                     int rssi1 = lhs.rssi;
                     int rssi2 = rhs.rssi;
                     Log.i(TAG,"compare    rssi2 - rssi1 > 2");
